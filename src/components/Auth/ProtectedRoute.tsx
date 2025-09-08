@@ -12,7 +12,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let isMounted = true; // to prevent state update if component unmounts
+    let isMounted = true; // Prevent state update if component unmounts
 
     // Fetch current session
     const fetchSession = async () => {
@@ -26,14 +26,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     fetchSession();
 
     // Listen for auth state changes
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, _session) => {
       if (isMounted) {
-        setUser(session?.user ?? null);
+        setUser(_session?.user ?? null); // use _session to satisfy ESLint
         setLoading(false);
       }
     });
 
-    // Cleanup subscription and prevent memory leaks
+    // Cleanup subscription to prevent memory leaks
     return () => {
       isMounted = false;
       authListener?.subscription.unsubscribe();
