@@ -1,7 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../supabase';
-import { Box, Grid, Typography, Card, CardMedia, CardContent, Button, Dialog, DialogContent, useTheme, useMediaQuery, Skeleton, Fade, Grow } from '@mui/material';
+import {
+  Box,
+  Grid,
+  Typography,
+  Card,
+  CardMedia,
+  CardContent,
+  Button,
+  Dialog,
+  DialogContent,
+  useTheme,
+  useMediaQuery,
+  Skeleton,
+  Fade,
+  Grow,
+} from '@mui/material';
 import ZoomableImage from './ZoomableImage';
+import ErrorBoundary from '../ErrorBoundary'; // ✅ moved here
 
 interface DocumentItem {
   id: string;
@@ -11,8 +27,6 @@ interface DocumentItem {
   createdAt: any;
   fileType: string;
 }
-
-import ErrorBoundary from '../ErrorBoundary';
 
 const Gallery: React.FC = () => {
   const [user, setUser] = useState<any>(null);
@@ -26,7 +40,9 @@ const Gallery: React.FC = () => {
 
   useEffect(() => {
     const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
     };
     getSession();
@@ -56,32 +72,26 @@ const Gallery: React.FC = () => {
 
         if (error) throw error;
 
-        console.log('Fetched documents:', data);  // Debug log for URLs
+        console.log('Fetched documents:', data); // Debug log for URLs
 
-setDocuments(
-  (data || []).map((doc: any) => {
-    // Use URLs directly from the database without calling getPublicUrl
-    const originalFileUrl = doc.original_file_url || '';
-    const processedFileUrl = doc.processed_file_url || '';
+        setDocuments(
+          (data || []).map((doc: any) => {
+            // Use URLs directly from the database without calling getPublicUrl
+            const originalFileUrl = doc.original_file_url || '';
+            const processedFileUrl = doc.processed_file_url || '';
 
-    console.log("Using direct URL:", processedFileUrl);
+            console.log('Using direct URL:', processedFileUrl);
 
-    return {
-      id: doc.id,
-      originalFileName: doc.original_file_name,
-      originalFileUrl,
-      processedFileUrl,
-      createdAt: doc.created_at,
-      fileType: doc.file_type,
-    };
-  })
-);
-
-
-
-
-
-
+            return {
+              id: doc.id,
+              originalFileName: doc.original_file_name,
+              originalFileUrl,
+              processedFileUrl,
+              createdAt: doc.created_at,
+              fileType: doc.file_type,
+            };
+          })
+        );
       } catch (err) {
         console.error('Error fetching documents:', err);
         setError('Error loading your documents. Please try again.');
@@ -167,11 +177,7 @@ setDocuments(
         <Grid container spacing={isMobile ? 2 : 3}>
           {documents.map((doc, index) => (
             <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={doc.id} component="div">
-              <Grow
-                in={true}
-                timeout={500 + index * 100}
-                style={{ transformOrigin: '0 0 0' }}
-              >
+              <Grow in={true} timeout={500 + index * 100} style={{ transformOrigin: '0 0 0' }}>
                 <Card
                   sx={{
                     cursor: 'pointer',
@@ -187,7 +193,7 @@ setDocuments(
                     '&:active': {
                       transform: 'scale(0.98) translateY(-2px)',
                       transition: 'transform 0.1s ease',
-                    }
+                    },
                   }}
                   onClick={() => handleDocumentClick(doc)}
                 >
@@ -201,8 +207,8 @@ setDocuments(
                         objectFit: 'cover',
                         transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                         '&:hover': {
-                          transform: 'scale(1.1)'
-                        }
+                          transform: 'scale(1.1)',
+                        },
                       }}
                     />
                     <Box
@@ -212,12 +218,13 @@ setDocuments(
                         left: 0,
                         right: 0,
                         bottom: 0,
-                        background: 'linear-gradient(135deg, rgba(102,126,234,0) 0%, rgba(102,126,234,0.1) 100%)',
+                        background:
+                          'linear-gradient(135deg, rgba(102,126,234,0) 0%, rgba(102,126,234,0.1) 100%)',
                         opacity: 0,
                         transition: 'opacity 0.3s ease',
                         '.MuiCard-root:hover &': {
-                          opacity: 1
-                        }
+                          opacity: 1,
+                        },
                       }}
                     />
                   </Box>
@@ -232,8 +239,8 @@ setDocuments(
                         whiteSpace: 'nowrap',
                         transition: 'color 0.3s ease',
                         '.MuiCard-root:hover &': {
-                          color: 'primary.main'
-                        }
+                          color: 'primary.main',
+                        },
                       }}
                     >
                       {doc.originalFileName}
@@ -247,11 +254,14 @@ setDocuments(
                         gap: 0.5,
                         transition: 'color 0.3s ease',
                         '.MuiCard-root:hover &': {
-                          color: 'primary.main'
-                        }
+                          color: 'primary.main',
+                        },
                       }}
                     >
-                      📅 {doc.createdAt ? new Date(doc.createdAt).toLocaleDateString() : 'Unknown date'}
+                      📅{' '}
+                      {doc.createdAt
+                        ? new Date(doc.createdAt).toLocaleDateString()
+                        : 'Unknown date'}
                     </Typography>
                   </CardContent>
                 </Card>
@@ -260,12 +270,7 @@ setDocuments(
           ))}
         </Grid>
 
-        <Dialog
-          open={dialogOpen}
-          onClose={handleCloseDialog}
-          maxWidth="lg"
-          fullWidth
-        >
+        <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="lg" fullWidth>
           <DialogContent>
             {selectedDocument && (
               <>
