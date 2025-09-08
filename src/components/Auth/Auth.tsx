@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../firebase';
-import { Box, Button, Container, TextField, Typography, Paper, Tabs, Tab } from '@mui/material';
+import { supabase } from '../../supabase';
+import { Box, Button, Container, TextField, Typography, Paper, Tabs, Tab, Alert, Avatar } from '@mui/material';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -44,7 +44,14 @@ const Auth: React.FC = () => {
     e.preventDefault();
     setError('');
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      if (error) throw error;
+      if (data.user && !data.user.email_confirmed_at) {
+        setError('Please confirm your email before logging in.');
+      }
     } catch (error: any) {
       setError(error.message);
     }
@@ -54,7 +61,14 @@ const Auth: React.FC = () => {
     e.preventDefault();
     setError('');
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+      if (data.user && !data.user.email_confirmed_at) {
+        setError('Email not confirmed. Please check your inbox.');
+      }
     } catch (error: any) {
       setError(error.message);
     }
@@ -62,14 +76,49 @@ const Auth: React.FC = () => {
 
   return (
     <Container maxWidth="sm">
-      <Paper elevation={3} sx={{ mt: 8, p: 2 }}>
-        <Typography variant="h4" align="center" gutterBottom>
-          Document Scanner App
-        </Typography>
-        
-        <Tabs value={tabValue} onChange={handleTabChange} centered>
-          <Tab label="Login" />
-          <Tab label="Register" />
+      <Paper
+        elevation={6}
+        sx={{
+          mt: 8,
+          p: 4,
+          borderRadius: 3,
+          background: 'linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%)',
+          position: 'relative',
+          overflow: 'hidden'
+        }}
+      >
+        <Box sx={{ textAlign: 'center', mb: 3 }}>
+          <Avatar sx={{ mx: 'auto', mb: 2, bgcolor: 'primary.main', width: 56, height: 56 }}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 600, color: 'primary.main' }}>
+            Document Scanner
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+            Secure document processing and management
+          </Typography>
+        </Box>
+
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
+          centered
+          sx={{
+            mb: 3,
+            '& .MuiTab-root': {
+              fontWeight: 600,
+              textTransform: 'none',
+              fontSize: '1rem',
+              minHeight: 48
+            },
+            '& .MuiTabs-indicator': {
+              height: 3,
+              borderRadius: 1.5
+            }
+          }}
+        >
+          <Tab label="Sign In" />
+          <Tab label="Create Account" />
         </Tabs>
         
         <TabPanel value={tabValue} index={0}>
@@ -85,6 +134,15 @@ const Auth: React.FC = () => {
               autoFocus
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              sx={{
+                mb: 2,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  '&:hover fieldset': {
+                    borderColor: 'primary.main',
+                  },
+                },
+              }}
             />
             <TextField
               margin="normal"
@@ -97,17 +155,39 @@ const Auth: React.FC = () => {
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              sx={{
+                mb: 3,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  '&:hover fieldset': {
+                    borderColor: 'primary.main',
+                  },
+                },
+              }}
             />
             {error && (
-              <Typography color="error" align="center">
+              <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
                 {error}
-              </Typography>
+              </Alert>
             )}
             <Button
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              size="large"
+              sx={{
+                mt: 1,
+                mb: 2,
+                py: 1.5,
+                borderRadius: 2,
+                fontWeight: 600,
+                textTransform: 'none',
+                fontSize: '1rem',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                '&:hover': {
+                  boxShadow: '0 6px 20px rgba(0,0,0,0.2)',
+                }
+              }}
             >
               Sign In
             </Button>
@@ -127,6 +207,15 @@ const Auth: React.FC = () => {
               autoFocus
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              sx={{
+                mb: 2,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  '&:hover fieldset': {
+                    borderColor: 'primary.main',
+                  },
+                },
+              }}
             />
             <TextField
               margin="normal"
@@ -139,19 +228,41 @@ const Auth: React.FC = () => {
               autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              sx={{
+                mb: 3,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  '&:hover fieldset': {
+                    borderColor: 'primary.main',
+                  },
+                },
+              }}
             />
             {error && (
-              <Typography color="error" align="center">
+              <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
                 {error}
-              </Typography>
+              </Alert>
             )}
             <Button
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              size="large"
+              sx={{
+                mt: 1,
+                mb: 2,
+                py: 1.5,
+                borderRadius: 2,
+                fontWeight: 600,
+                textTransform: 'none',
+                fontSize: '1rem',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                '&:hover': {
+                  boxShadow: '0 6px 20px rgba(0,0,0,0.2)',
+                }
+              }}
             >
-              Register
+              Create Account
             </Button>
           </Box>
         </TabPanel>

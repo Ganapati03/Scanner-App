@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Box, Button, CircularProgress, Typography, Grid, Paper } from '@mui/material';
+import { Box, Button, CircularProgress, Typography, Grid, Paper, Fade, Zoom } from '@mui/material';
 
 interface ImageProcessorProps {
   imageData: string;
@@ -149,17 +149,28 @@ const ImageProcessor: React.FC<ImageProcessorProps> = ({ imageData, onProcessed 
           <Paper elevation={2} sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>Processed Image</Typography>
             {processedImage ? (
-              <Box
-                component="img"
-                src={processedImage}
-                alt="Processed"
-                sx={{
-                  width: '100%',
-                  height: 'auto',
-                  maxHeight: '500px',
-                  objectFit: 'contain'
-                }}
-              />
+              <Fade in={true} timeout={600}>
+                <Zoom in={true} timeout={500}>
+                  <Box
+                    component="img"
+                    src={processedImage}
+                    alt="Processed"
+                    sx={{
+                      width: '100%',
+                      height: 'auto',
+                      maxHeight: '500px',
+                      objectFit: 'contain',
+                      borderRadius: 2,
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      '&:hover': {
+                        transform: 'scale(1.02)',
+                        boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+                      }
+                    }}
+                  />
+                </Zoom>
+              </Fade>
             ) : (
               <Box sx={{ p: 4, textAlign: 'center' }}>
                 <Typography color="textSecondary">Process an image to see the result</Typography>
