@@ -44,16 +44,16 @@ const Auth: React.FC = () => {
     e.preventDefault();
     setError('');
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
       });
-      if (error) throw error;
-      if (data.user && !data.user.email_confirmed_at) {
+      if (signUpError) throw signUpError;
+      if (data?.user && !data.user.email_confirmed_at) {
         setError('Please confirm your email before logging in.');
       }
-    } catch (error: any) {
-      setError(error.message);
+    } catch (err: any) {
+      setError(err.message);
     }
   };
 
@@ -61,16 +61,16 @@ const Auth: React.FC = () => {
     e.preventDefault();
     setError('');
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      if (error) throw error;
-      if (data.user && !data.user.email_confirmed_at) {
+      if (signInError) throw signInError;
+      if (data?.user && !data.user.email_confirmed_at) {
         setError('Email not confirmed. Please check your inbox.');
       }
-    } catch (error: any) {
-      setError(error.message);
+    } catch (err: any) {
+      setError(err.message);
     }
   };
 

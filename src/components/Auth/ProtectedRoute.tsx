@@ -12,17 +12,30 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const session = supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    let isMounted = true; // to prevent state update if component unmounts
 
+    // Fetch current session
+    const fetchSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (isMounted) {
+        setUser(data.session?.user ?? null);
+        setLoading(false);
+      }
+    };
+
+    fetchSession();
+
+    // Listen for auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
+      if (isMounted) {
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
     });
 
+    // Cleanup subscription and prevent memory leaks
     return () => {
+      isMounted = false;
       authListener?.subscription.unsubscribe();
     };
   }, []);
